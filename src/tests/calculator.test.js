@@ -1,6 +1,6 @@
 const assert = require("node:assert/strict");
 const { describe, it } = require("node:test");
-const { calculate } = require("../calculator.js");
+const { calculate, modulo, power, squareRoot } = require("../calculator.js");
 
 describe("calculator", () => {
   describe("addition", () => {
@@ -54,10 +54,62 @@ describe("calculator", () => {
     });
   });
 
+  describe("modulo", () => {
+    it("calculates the example remainder", () => {
+      assert.equal(modulo(5, 2), 1);
+      assert.equal(calculate("%", 5, 2), 1);
+      assert.equal(calculate("modulo", 5, 2), 1);
+    });
+
+    it("returns zero when the dividend is evenly divisible", () => {
+      assert.equal(modulo(6, 3), 0);
+    });
+
+    it("preserves the dividend's sign for negative dividends", () => {
+      assert.equal(modulo(-5, 2), -1);
+    });
+
+    it("throws a clear error when the divisor is zero", () => {
+      assert.throws(() => modulo(10, 0), {
+        message: "Cannot calculate modulo by zero.",
+      });
+    });
+  });
+
+  describe("power", () => {
+    it("calculates the example power", () => {
+      assert.equal(power(2, 3), 8);
+      assert.equal(calculate("power", 2, 3), 8);
+      assert.equal(calculate("^", 2, 3), 8);
+    });
+
+    it("returns one for an exponent of zero", () => {
+      assert.equal(power(5, 0), 1);
+    });
+  });
+
+  describe("square root", () => {
+    it("calculates the example square root", () => {
+      assert.equal(squareRoot(16), 4);
+      assert.equal(calculate("squareRoot", 16), 4);
+      assert.equal(calculate("sqrt", 16), 4);
+    });
+
+    it("returns zero for zero", () => {
+      assert.equal(squareRoot(0), 0);
+    });
+
+    it("throws a clear error for negative numbers", () => {
+      assert.throws(() => squareRoot(-1), {
+        message: "Cannot calculate the square root of a negative number.",
+      });
+    });
+  });
+
   it("rejects unsupported operations", () => {
     assert.throws(
-      () => calculate("%", 10, 3),
-      { message: "Unsupported operation: %" },
+      () => calculate("unknown", 10, 3),
+      { message: "Unsupported operation: unknown" },
     );
   });
 });

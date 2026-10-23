@@ -1,6 +1,24 @@
 #!/usr/bin/env node
 
-// Supported operations: addition (+), subtraction (-), multiplication (*), and division (/).
+// Supported operations: arithmetic (+, -, *, /, %), power, and square root.
+function modulo(a, b) {
+  if (b === 0) {
+    throw new Error("Cannot calculate modulo by zero.");
+  }
+  return a % b;
+}
+
+function power(base, exponent) {
+  return base ** exponent;
+}
+
+function squareRoot(n) {
+  if (n < 0) {
+    throw new Error("Cannot calculate the square root of a negative number.");
+  }
+  return Math.sqrt(n);
+}
+
 const OPERATIONS = {
   add: (left, right) => left + right,
   "+": (left, right) => left + right,
@@ -10,6 +28,13 @@ const OPERATIONS = {
   "*": (left, right) => left * right,
   divide: (left, right) => left / right,
   "/": (left, right) => left / right,
+  modulo,
+  "%": modulo,
+  power,
+  "^": power,
+  "**": power,
+  squareRoot: (n) => squareRoot(n),
+  sqrt: (n) => squareRoot(n),
 };
 
 function calculate(operation, left, right) {
@@ -17,32 +42,43 @@ function calculate(operation, left, right) {
     throw new Error(`Unsupported operation: ${operation}`);
   }
   const calculateOperation = OPERATIONS[operation];
+  if (operation === "squareRoot" || operation === "sqrt") {
+    return calculateOperation(left);
+  }
   if (operation === "divide" || operation === "/") {
     // Avoid returning Infinity for a zero divisor.
     if (right === 0) {
       throw new Error("Cannot divide by zero.");
     }
   }
+  if (operation === "modulo" || operation === "%") {
+    return calculateOperation(left, right);
+  }
   return calculateOperation(left, right);
 }
 
 function main(args) {
-  if (args.length !== 3) {
+  const unaryOperation = args[0] === "squareRoot" || args[0] === "sqrt";
+  if (args.length !== (unaryOperation ? 2 : 3)) {
     throw new Error(
-      "Usage: node src/calculator.js <add|subtract|multiply|divide|+|-|*|/> <number> <number>",
+      "Usage: node src/calculator.js <add|subtract|multiply|divide|modulo|power|squareRoot|+|-|*|/|%|^|**|sqrt> <number> [number]",
     );
   }
 
   const [operation, leftInput, rightInput] = args;
   const left = Number(leftInput);
-  const right = Number(rightInput);
+  const right = unaryOperation ? undefined : Number(rightInput);
   if (
     leftInput.trim() === "" ||
-    rightInput.trim() === "" ||
     !Number.isFinite(left) ||
-    !Number.isFinite(right)
+    (!unaryOperation &&
+      (rightInput.trim() === "" || !Number.isFinite(right)))
   ) {
-    throw new Error("Both operands must be finite numbers.");
+    throw new Error(
+      unaryOperation
+        ? "The operand must be a finite number."
+        : "Both operands must be finite numbers.",
+    );
   }
 
   console.log(calculate(operation, left, right));
@@ -57,4 +93,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { calculate };
+module.exports = { calculate, modulo, power, squareRoot };
