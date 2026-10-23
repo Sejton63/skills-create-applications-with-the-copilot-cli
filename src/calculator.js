@@ -18,6 +18,7 @@ function calculate(operation, left, right) {
   }
   const calculateOperation = OPERATIONS[operation];
   if (operation === "divide" || operation === "/") {
+    // Avoid returning Infinity for a zero divisor.
     if (right === 0) {
       throw new Error("Cannot divide by zero.");
     }
